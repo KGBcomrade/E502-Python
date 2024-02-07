@@ -219,16 +219,17 @@ PyObject* adcSyncGetFrame(PyObject *self, PyObject *args, PyObject *kws) {
 		err = X502_ProcessData(p->hnd, buf, size, volts ? X502_PROC_FLAGS_VOLT : 0, data, &cc, NULL, NULL);
 		if(cc2 != cc)
 			printf("Not enought space in buffer: %d<%d\n", cc2, cc);
+		if(err == X502_ERR_OK) {
+			PyObject* list = PyList_New(cc);
+			for(size_t i = 0; i < cc; i++)
+				PyList_SetItem(list, i, PyFloat_FromDouble(data[i]));
+			free(data);
+		
+			return list;
+		}
 	}
 
-	if(err == X502_ERR_OK) {
-		PyObject* list = PyList_New(cc);
-		for(size_t i = 0; i < cc; i++)
-			PyList_SetItem(list, i, PyFloat_FromDouble(buf[i]));
-		free(buf);
 	
-		return list;
-	}
 	PyErr_SetString(PyErr_NewException("Error", NULL, NULL), "Error reading frame");
 	return NULL;
 }
