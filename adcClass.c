@@ -138,7 +138,7 @@ PyObject* adcAsyncGetFrame(PyObject *self, PyObject *args, PyObject *kws) {
 		timeout = PyLong_AsLong(timeoutI);
 
 	//Channel count
-	int cc = -1;
+	uint32_t cc;
 	int32_t err = X502_GetLChannelCount(p->hnd, &cc);
 	//Reading
 	if(err == X502_ERR_OK) {
