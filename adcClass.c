@@ -23,8 +23,10 @@ PyObject *adcNew(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 
 int adcInit(t_adc *self, PyObject *args, PyObject *kwds) {
 	int32_t err = E502_OpenUsb(self->hnd, NULL);
-	if(err != X502_ERR_OK)
+	if(err != X502_ERR_OK) {
+		PyErr_SetString(PyExc_RuntimeError, "Error opening USB");
 		return -1;
+	}
 	return 0;
 }
 
@@ -36,7 +38,7 @@ PyObject* adcSetChannelCount(PyObject *self, PyObject *args) {
 	int32_t err = X502_SetLChannelCount(p->hnd, count);
 	if(err == X502_ERR_OK)
 		Py_RETURN_NONE;
-	PyErr_SetString(PyErr_NewException("Error", NULL, NULL), "Error setting channels count");
+	PyErr_SetString(PyExc_RuntimeError, "Error setting channels count");
 	return NULL;
 }
 
@@ -56,14 +58,14 @@ PyObject* adcSetChannel(PyObject *self, PyObject *args) {
 			break;
 		}
 	if(modeCode == -1) {
-		PyErr_SetString(PyErr_NewException("ValueError", NULL, NULL), "Unrecongized mode");
+		PyErr_SetString(PyExc_ValueError, "Unrecongized mode");
 		return NULL;
 	}
 
 	int rangeInt = range >= 1 ? range : range * -10; // 0.5 -> -5, 0.2 -> -2
 	switch(rangeInt) {
 		default:
-			PyErr_SetString(PyErr_NewException("ValueError", NULL, NULL), "Unrecongized range");
+			PyErr_SetString(PyExc_ValueError, "Unrecongized range");
 			return NULL;
 			break;
 		case 10:
@@ -88,7 +90,7 @@ PyObject* adcSetChannel(PyObject *self, PyObject *args) {
 
 	int32_t err = X502_SetLChannel(p->hnd, lChannel, pChannel, modeCode, rangeCode, avg);
 	if(err != X502_ERR_OK) {
-		PyErr_SetString(PyErr_NewException("Error", NULL, NULL), "Error setting channel");
+		PyErr_SetString(PyExc_RuntimeError, "Error setting channel");
 		return NULL;
 	}
 	Py_RETURN_NONE;
@@ -106,7 +108,7 @@ PyObject* adcSetFreq(PyObject *self, PyObject *args) {
 	
 	int32_t err = X502_SetAdcFreq(p->hnd, &freq, freq_cI == Py_None ? NULL : &freq_c);
 	if(err != X502_ERR_OK) {
-		PyErr_SetString(PyErr_NewException("Error", NULL, NULL), "Error setting frequency");
+		PyErr_SetString(PyExc_RuntimeError, "Error setting frequency");
 		return NULL;
 	}
 	return PyFloat_FromDouble(freq);
@@ -116,7 +118,7 @@ PyObject* adcConfigure(PyObject *self, PyObject *args) {
 	t_adc *p = (t_adc*)self;
 	int32_t err = X502_Configure(p->hnd, 0);
 	if(err != X502_ERR_OK) {
-		PyErr_SetString(PyErr_NewException("Error", NULL, NULL), "Error configuring ADC");
+		PyErr_SetString(PyExc_RuntimeError, "Error configuring ADC");
 		return NULL;
 	}
 	Py_RETURN_NONE;
@@ -154,7 +156,7 @@ PyObject* adcAsyncGetFrame(PyObject *self, PyObject *args, PyObject *kws) {
 			return list;
 		}
 	}
-	PyErr_SetString(PyErr_NewException("Error", NULL, NULL), "Error reading frame");
+	PyErr_SetString(PyExc_RuntimeError, "Error reading frame");
 	return NULL;
 }
 
@@ -167,7 +169,7 @@ PyObject* adcStreamsSetEnabled(PyObject *self, PyObject *args) {
 	uint32_t err = enabled ? X502_StreamsEnable(p->hnd, X502_STREAM_ADC) : X502_StreamsDisable(p->hnd, X502_STREAM_ADC);
 	if(err == X502_ERR_OK)
 		Py_RETURN_NONE;
-	PyErr_SetString(PyErr_NewException("Error", NULL, NULL), "Error enabling streams");
+	PyErr_SetString(PyExc_RuntimeError, "Error enabling streams");
 	return NULL;
 }
 
@@ -176,7 +178,7 @@ PyObject* adcStreamsStart(PyObject *self, PyObject *args) {
 	uint32_t err = X502_StreamsStart(p->hnd);
 	if(err == X502_ERR_OK)
 		Py_RETURN_NONE;
-	PyErr_SetString(PyErr_NewException("Error", NULL, NULL), "Error starting streams");
+	PyErr_SetString(PyExc_RuntimeError, "Error starting streams");
 	return NULL;
 }
 
@@ -185,7 +187,7 @@ PyObject* adcStreamsStop(PyObject *self, PyObject *args) {
 	uint32_t err = X502_StreamsStop(p->hnd);
 	if(err == X502_ERR_OK)
 		Py_RETURN_NONE;
-	PyErr_SetString(PyErr_NewException("Error", NULL, NULL), "Error stopping streams");
+	PyErr_SetString(PyExc_RuntimeError, "Error stopping streams");
 	return NULL;
 }
 
@@ -230,6 +232,6 @@ PyObject* adcSyncGetFrame(PyObject *self, PyObject *args, PyObject *kws) {
 	}
 
 	
-	PyErr_SetString(PyErr_NewException("Error", NULL, NULL), "Error reading frame");
+	PyErr_SetString(PyExc_RuntimeError, "Error reading frame");
 	return NULL;
 }
