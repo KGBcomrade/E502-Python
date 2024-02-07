@@ -2,7 +2,7 @@
 #include <string.h>
 
 #define ERR_INV_ARGS {\
-	PyErr_SetString(PyErr_NewException("TypeError", NULL, NULL), "Invalid arguments"); \
+	PyErr_BadArgument(); \
 	return NULL; \
 }
 #define STREAM_BUF_SIZE 4096*200
