@@ -49,7 +49,6 @@ PyObject* adcSetChannel(PyObject *self, PyObject *args) {
 	char *mode;
 	if(!PyArg_ParseTuple(args, "iisf|i", &lChannel, &pChannel, &mode, &range, &avg))
 		ERR_INV_ARGS
-	printf("avg = %d\n", avg);
 	
 	char* modes[] = {"comm", "diff", "zero"};
 	int modeCode = -1, rangeCode = -1;
