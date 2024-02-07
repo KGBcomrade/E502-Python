@@ -13,7 +13,7 @@ PyDoc_STRVAR(adcSetChannelDoc, "Sets a logical channel\'s physical number, mode,
 			       "        \'diff\': Differential measurement\n"
 			       "        \'zero\': Zero measurement\n"
 			       "   range ({0.2, 0.5, 1, 2, 5, 10}): measurement range in volts.\n"
-			       "   avg (int): averaging coefficient. If zero, sets to default.\n"
+			       "   avg (int, optional): averaging coefficient. If zero, sets to default. Defaults to 0.\n"
 			       "Don't forget to apply adc.configure() after setting up an ADC.");
 PyDoc_STRVAR(adcSetFreqDoc, "Sets an ADC's acquisition frequency to the closest to the given one.\n"
 			    "Args:\n"

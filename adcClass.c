@@ -44,11 +44,12 @@ PyObject* adcSetChannelCount(PyObject *self, PyObject *args) {
 
 PyObject* adcSetChannel(PyObject *self, PyObject *args) {
 	t_adc *p = (t_adc*)self;
-	int lChannel, pChannel, avg;
+	int lChannel, pChannel, avg = 0;
 	float range;
 	char *mode;
-	if(!PyArg_ParseTuple(args, "iisfi", &lChannel, &pChannel, &mode, &range, &avg))
+	if(!PyArg_ParseTuple(args, "iisf|i", &lChannel, &pChannel, &mode, &range, &avg))
 		ERR_INV_ARGS
+	printf("avg = %d\n", avg);
 	
 	char* modes[] = {"comm", "diff", "zero"};
 	int modeCode = -1, rangeCode = -1;
