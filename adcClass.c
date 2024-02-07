@@ -123,7 +123,7 @@ PyObject* adcConfigure(PyObject *self, PyObject *args) {
 
 PyObject* adcAsyncGetFrame(PyObject *self, PyObject *args, PyObject *kws) {
 	t_adc *p = (t_adc*)self;
-	char* keys[] = {"volts", "timeout", NULL};	
+	static char* keys[] = {"volts", "timeout", NULL};	
 	PyObject *voltsI = Py_None, *timeoutI = Py_None;
 	if(!PyArg_ParseTupleAndKeywords(args, kws, "|OO", keys, &voltsI, &timeoutI))
 		ERR_INV_ARGS
