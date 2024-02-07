@@ -5,6 +5,7 @@
 	PyErr_SetString(PyErr_NewException("TypeError", NULL, NULL), "Invalid arguments"); \
 	return NULL; \
 }
+#define STREAM_BUF_SIZE 4096*200
 
 void adcDealloc(t_adc *self) {
 	X502_Close(self->hnd);
@@ -152,6 +153,81 @@ PyObject* adcAsyncGetFrame(PyObject *self, PyObject *args, PyObject *kws) {
 
 			return list;
 		}
+	}
+	PyErr_SetString(PyErr_NewException("Error", NULL, NULL), "Error reading frame");
+	return NULL;
+}
+
+PyObject* adcStreamsSetEnabled(PyObject *self, PyObject *args) {
+	t_adc *p = (t_adc*)self;
+	int enabled;
+	if(!PyArg_ParseTuple(args, "b", &enabled))
+		ERR_INV_ARGS
+	
+	uint32_t err = enabled ? X502_StreamsEnable(p->hnd, X502_STREAM_ADC) : X502_StreamsDisable(p->hnd, X502_STREAM_ADC);
+	if(err == X502_ERR_OK)
+		Py_RETURN_NONE;
+	PyErr_SetString(PyErr_NewException("Error", NULL, NULL), "Error enabling streams");
+	return NULL;
+}
+
+PyObject* adcStreamsStart(PyObject *self, PyObject *args) {
+	t_adc *p = (t_adc*)self;
+	uint32_t err = X502_StreamsStart(p->hnd);
+	if(err == X502_ERR_OK)
+		Py_RETURN_NONE;
+	PyErr_SetString(PyErr_NewException("Error", NULL, NULL), "Error starting streams");
+	return NULL;
+}
+
+PyObject* adcStreamsStop(PyObject *self, PyObject *args) {
+	t_adc *p = (t_adc*)self;
+	uint32_t err = X502_StreamsStop(p->hnd);
+	if(err == X502_ERR_OK)
+		Py_RETURN_NONE;
+	PyErr_SetString(PyErr_NewException("Error", NULL, NULL), "Error stopping streams");
+	return NULL;
+}
+
+PyObject* adcSyncGetFrame(PyObject *self, PyObject *args, PyObject *kws) {
+	t_adc *p = (t_adc*)self;
+
+	//Parsing args
+	static char* keys[] = {"volts", "timeout", NULL};	
+	PyObject *voltsI = Py_None, *timeoutI = Py_None;
+	if(!PyArg_ParseTupleAndKeywords(args, kws, "|OO", keys, &voltsI, &timeoutI))
+		ERR_INV_ARGS
+	int volts, timeout;
+	if(voltsI == Py_None)
+		volts = 1;
+	else
+		volts = PyLong_AsLong(voltsI);
+	if(timeoutI == Py_None)
+		timeout = 1000;
+	else
+		timeout = PyLong_AsLong(timeoutI);
+
+	static uint32_t buf[STREAM_BUF_SIZE];
+	int32_t size = X502_Recv(p->hnd, buf, STREAM_BUF_SIZE, timeout);
+	uint32_t cc;
+	int32_t err;
+	if(size >= 0)
+		err = X502_GetLChannelCount(p->hnd, &cc);
+	if(err == X502_ERR_OK) {
+		double *data = (double*)calloc(cc, sizeof(double));
+		uint32_t cc2 = cc;
+		err = X502_ProcessData(p->hnd, buf, size, volts ? X502_PROC_FLAGS_VOLT : 0, data, &cc, NULL, NULL);
+		if(cc2 != cc)
+			printf("Not enought space in buffer: %d<%d\n", cc2, cc);
+	}
+
+	if(err == X502_ERR_OK) {
+		PyObject* list = PyList_New(cc);
+		for(size_t i = 0; i < cc; i++)
+			PyList_SetItem(list, i, PyFloat_FromDouble(buf[i]));
+		free(buf);
+	
+		return list;
 	}
 	PyErr_SetString(PyErr_NewException("Error", NULL, NULL), "Error reading frame");
 	return NULL;

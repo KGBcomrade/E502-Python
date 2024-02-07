@@ -31,4 +31,12 @@ PyObject* adcConfigure(PyObject *self, PyObject *args);
 
 PyObject* adcAsyncGetFrame(PyObject *self, PyObject *args, PyObject *kws);
 
+PyObject* adcStreamsSetEnabled(PyObject *self, PyObject *args);
+
+PyObject* adcStreamsStart(PyObject *self, PyObject *args);
+
+PyObject* adcStreamsStop(PyObject *self, PyObject *args);
+
+PyObject* adcSyncGetFrame(PyObject *self, PyObject *args, PyObject *kws);
+
 #endif

@@ -11,6 +11,10 @@ static PyMethodDef adcMethods[] = {
 	{"setFreq", adcSetFreq, METH_VARARGS, NULL},
 	{"configure", adcConfigure, METH_VARARGS, NULL},
 	{"asyncGetFrame", adcAsyncGetFrame, METH_VARARGS | METH_KEYWORDS, NULL},
+	{"setStreamsEnabled", adcStreamsSetEnabled, METH_VARARGS, NULL},
+	{"startStreams", adcStreamsStart, METH_VARARGS, NULL},
+	{"stopStreams", adcStreamsStop, METH_VARARGS, NULL},
+	{"syncGetFrame", adcSyncGetFrame, METH_VARARGS | METH_KEYWORDS, NULL},
 	{NULL}
 };
 
