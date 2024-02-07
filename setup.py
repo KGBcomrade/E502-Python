@@ -2,7 +2,7 @@ from setuptools import Extension, setup
 
 setup(
         name='adclib',
-        version='0.4',
+        version='1.0',
         ext_modules=[Extension(name='adc', sources=['adc.c', 'adcClass.c'], extra_link_args=['-le502api', '-lx502api'])],
         
 )

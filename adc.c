@@ -3,24 +3,25 @@
 #include <structmember.h>
 #include <x502api.h>
 #include <e502api.h>
+#include "adcdocstrings.h"
 
 
 static PyMethodDef adcMethods[] = {
-	{"setChannelCount", adcSetChannelCount, METH_VARARGS, NULL},
-	{"setChannel", adcSetChannel, METH_VARARGS, NULL},
-	{"setFreq", adcSetFreq, METH_VARARGS, NULL},
-	{"configure", adcConfigure, METH_VARARGS, NULL},
-	{"asyncGetFrame", adcAsyncGetFrame, METH_VARARGS | METH_KEYWORDS, NULL},
-	{"setStreamsEnabled", adcStreamsSetEnabled, METH_VARARGS, NULL},
-	{"startStreams", adcStreamsStart, METH_VARARGS, NULL},
-	{"stopStreams", adcStreamsStop, METH_VARARGS, NULL},
-	{"syncGetFrame", adcSyncGetFrame, METH_VARARGS | METH_KEYWORDS, NULL},
+	{"setChannelCount", adcSetChannelCount, METH_VARARGS, adcSetChannelCountDoc},
+	{"setChannel", adcSetChannel, METH_VARARGS, adcSetChannelDoc},
+	{"setFreq", adcSetFreq, METH_VARARGS, adcSetFreqDoc},
+	{"configure", adcConfigure, METH_VARARGS, adcConfigureDoc},
+	{"asyncGetFrame", adcAsyncGetFrame, METH_VARARGS | METH_KEYWORDS, adcAsyncGetFrameDoc},
+	{"setStreamsEnabled", adcStreamsSetEnabled, METH_VARARGS, adcStreamsSetEnabledDoc},
+	{"startStreams", adcStreamsStart, METH_VARARGS, adcStreamsStartDoc},
+	{"stopStreams", adcStreamsStop, METH_VARARGS, adcStreamsStopDoc},
+	{"syncGetFrame", adcSyncGetFrame, METH_VARARGS | METH_KEYWORDS, adcSyncGetFrameDoc},
 	{NULL}
 };
 
 static PyTypeObject adc_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "adc.ADC",               	    /* tp_name */
+    "adc.adc",               	    /* tp_name */
     sizeof(t_adc),                  /* tp_basicsize */
     0,                              /* tp_itemsize */
     (destructor)adcDealloc,         /* tp_dealloc */
@@ -39,7 +40,7 @@ static PyTypeObject adc_Type = {
     0,                              /* tp_setattro */
     0,                              /* tp_as_buffer */
     0,                              /* tp_flags */
-    0,                              /* tp_doc */
+    "L-CARD E-502 ADC reader class",/* tp_doc */
     0,                              /* tp_traverse */
     0,                              /* tp_clear */
     0,                              /* tp_richcompare */
