@@ -216,15 +216,26 @@ PyObject* adcSyncGetFrame(PyObject *self, PyObject *args, PyObject *kws) {
 	if(size >= 0)
 		err = X502_GetLChannelCount(p->hnd, &cc);
 	if(err == X502_ERR_OK) {
-		double *data = (double*)calloc(cc, sizeof(double));
-		uint32_t cc2 = cc;
-		err = X502_ProcessData(p->hnd, buf, size, volts ? X502_PROC_FLAGS_VOLT : 0, data, &cc, NULL, NULL);
-		if(cc2 != cc)
-			printf("Not enought space in buffer: %d<%d\n", cc2, cc);
+		double *data = (double*)calloc(cc * size, sizeof(double));
+		uint32_t adcSize = cc * size;
+
+		uint32_t first_lch;
+        X502_GetNextExpectedLchNum(p->hnd, &first_lch);
+
+		err = X502_ProcessData(p->hnd, buf, size, volts ? X502_PROC_FLAGS_VOLT : 0, data, &adcSize, NULL, NULL);
 		if(err == X502_ERR_OK) {
 			PyObject* list = PyList_New(cc);
-			for(size_t i = 0; i < cc; i++)
-				PyList_SetItem(list, i, PyFloat_FromDouble(data[i]));
+			int tail = (size - cc + first_lch) % cc;
+			for(size_t i = 0; i < cc; i++) {
+				int inHead = i >= first_lch;
+				int inTail = tail > i;
+				size_t len = size / cc - 1 + (inHead ? 1 : 0) + (inTail> i ? 1 : 0);
+				size_t firstEntry = inHead ? i - first_lch : cc - first_lch + i;
+				PyObject* sublist = PyList_New(len);
+				for(size_t j = 0; j < len; j++)
+					PyList_SetItem(sublist, j, PyFloat_FromDouble(data[firstEntry + j * cc]));
+				PyList_SetItem(list, i, sublist); 
+			}
 			free(data);
 		
 			return list;
