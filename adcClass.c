@@ -54,7 +54,7 @@ PyObject* adcSetChannel(PyObject *self, PyObject *args) {
 	int modeCode = -1, rangeCode = -1;
 	for(size_t i = 0; i < 3; i++) 
 		if(!strcmp(modes[i], mode)) {
-			modeCode = 0;
+			modeCode = i;
 			break;
 		}
 	if(modeCode == -1) {
